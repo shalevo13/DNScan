@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Vulnerability Scanner - Secure Your Domain</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>DNScan</h1>
+                    <p class="tagline">Protect your domain infrastructure</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="intro-section">
+                <h2 class="section-title">Scan Your DNS for Vulnerabilities</h2>
+                <p class="section-description">Comprehensive security analysis including AXFR, SPF/DMARC, wildcard DNS, MX validation, and more.</p>
+            </div>
+
+            <div class="scan-form-container">
+                <form id="scanForm" class="scan-form">
+                    <div class="form-group">
+                        <label for="domain">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.61305 3.94821 5.32387 5.63604 3.63604C7.32387 1.94821 9.61305 1 12 1C14.3869 1 16.6761 1.94821 18.364 3.63604C20.0518 5.32387 21 7.61305 21 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Domain Name
+                        </label>
+                        <input type="text" id="domain" name="domain" placeholder="e.g., example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nameserver">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="2" y="2" width="20" height="8" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <rect x="2" y="14" width="20" height="8" rx="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 6H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 18H6.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Nameserver IP
+                        </label>
+                        <input type="text" id="nameserver" name="nameserver" placeholder="e.g., 127.0.0.1" value="127.0.0.1" required>
+                    </div>
+
+                    <button type="submit" class="scan-button" id="scanButton">
+                        <span class="button-text">Start Security Scan</span>
+                        <svg class="button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Analyzing DNS configuration...</p>
+                </div>
+            </div>
+
+            <div id="results" class="results-container" style="display: none;">
+                <div class="results-header">
+                    <h2>Security Analysis Results</h2>
+                    <div class="results-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Domain:</span>
+                            <span id="resultDomain" class="meta-value"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Nameserver:</span>
+                            <span id="resultNameserver" class="meta-value"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Scan Time:</span>
+                            <span id="resultTime" class="meta-value"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card score-card">
+                        <div class="stat-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="scoreValue">0</div>
+                            <div class="stat-label">Security Score</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon safe">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 11.08V12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2C13.18 2 14.32 2.22 15.38 2.64" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="safeCount">0</div>
+                            <div class="stat-label">Passed</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.29 3.86L1.82 18C1.64571 18.3024 1.55165 18.6453 1.54735 18.9945C1.54305 19.3437 1.62867 19.6886 1.79515 19.9947C1.96163 20.3008 2.20336 20.5577 2.49781 20.7414C2.79226 20.9251 3.12858 21.0293 3.47333 21.0433H20.4067C20.7514 21.0293 21.0877 20.9251 21.3822 20.7414C21.6766 20.5577 21.9184 20.3008 22.0848 19.9947C22.2513 19.6886 22.337 19.3437 22.3327 18.9945C22.3284 18.6453 22.2343 18.3024 22.06 18L13.59 3.86C13.4083 3.56611 13.1572 3.32312 12.8605 3.15448C12.5638 2.98585 12.2308 2.89717 11.8917 2.89717C11.5525 2.89717 11.2195 2.98585 10.9228 3.15448C10.6261 3.32312 10.375 3.56611 10.1933 3.86H10.29Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="warningCount">0</div>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon vulnerable">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="vulnerableCount">0</div>
+                            <div class="stat-label">Vulnerable</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tests-container" id="testsContainer"></div>
+
+                <button class="new-scan-button" onclick="resetForm()">
+                    Run New Scan
+                </button>
+            </div>
+
+            <div id="error" class="error-message" style="display: none;"></div>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 DNS Security Scanner. Built with care for your security.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
